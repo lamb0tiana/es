@@ -1,15 +1,17 @@
+version: '3.7'
+
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
       - bootstrap.memory_lock=true
       - xpack.security.enrollment.enabled=true
       - xpack.security.http.ssl.enabled=true
       - xpack.security.http.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-      - xpack.security.http.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      - xpack.security.http.ssl.keystore.password=""
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -33,6 +35,7 @@ services:
       - elasticsearch
     ports:
       - "5044:5044" # Port pour Logstash si nécessaire
+
   kibana:
     image: docker.elastic.co/kibana/kibana:8.8.0
     container_name: kibana
@@ -46,6 +49,7 @@ services:
       resources:
         limits:
           memory: 2g
+
 volumes:
   es-data:
     driver: local
