@@ -6,13 +6,10 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=true
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=true
       - bootstrap.memory_lock=true
-      - xpack.security.enrollment.enabled=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-      - xpack.security.http.ssl.keystore.password=""
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     ulimits:
       memlock:
         soft: -1
@@ -24,17 +21,17 @@ services:
       - es-data:/usr/share/elasticsearch/data
       - ./certs:/usr/share/elasticsearch/config/certs
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.10.2
-    container_name: logstash
-    volumes:
-      - ./pipeline:/usr/share/logstash/pipeline
-    environment:
-      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
-    depends_on:
-      - elasticsearch
-    ports:
-      - "5044:5044" # Port pour Logstash si nécessaire
+#  logstash:
+#    image: docker.elastic.co/logstash/logstash:8.10.2
+#    container_name: logstash
+#    volumes:
+#      - ./pipeline:/usr/share/logstash/pipeline
+#    environment:
+#      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+#    depends_on:
+#      - elasticsearch
+#    ports:
+#      - "5044:5044" # Port pour Logstash si nécessaire
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.8.0
@@ -42,7 +39,7 @@ services:
     depends_on:
       - elasticsearch
     environment:
-      ELASTICSEARCH_HOSTS: "http://localhost:9200"
+      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
     ports:
       - "5601:5601"
     deploy:
