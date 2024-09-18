@@ -25,8 +25,10 @@ services:
       timeout: 10s
       retries: 5
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.10.2
     container_name: logstash
+    build:
+      context: .
+      dockerfile: LogstashDockerfile
     volumes:
       - ./pipeline:/usr/share/logstash/pipeline
       - ./data:/usr/share/logstash/data
@@ -35,6 +37,7 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044" # Port pour Logstash si nécessaire
 

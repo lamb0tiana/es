@@ -1,0 +1,4 @@
+FROM docker.elastic.co/logstash/logstash:8.10.2
+
+# Installer le plugin CSV
+RUN logstash-plugin install logstash-codec-csv
