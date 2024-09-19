@@ -4,7 +4,7 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
       - xpack.monitoring.collection.enabled=true
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
@@ -13,7 +13,8 @@ services:
       - xpack.security.transport.ssl.key=certs/elasticsearch.key
       - xpack.security.transport.ssl.certificate=certs/elasticsearch.crt
       - xpack.security.transport.ssl.certificate_authorities=certs/elasticsearch.crt
-
+      - ELASTIC_PASSWORD=hello_elastic_dev
+      - KIBANA_PASSWORD=hello_kibana_dev
     ulimits:
       memlock:
         soft: -1
@@ -24,11 +25,32 @@ services:
     volumes:
       - es-data:/usr/share/elasticsearch/data
       - ./certs:/usr/share/elasticsearch/config/certs
+      - ./es_script.sh:/usr/share/elasticsearch/config/es_script.sh
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
+    command: bash -c "/usr/local/bin/docker-entrypoint.sh && bash /usr/share/elasticsearch/config/es_script.sh"
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+      ELASTICSEARCH_USERNAME: "kibana_system_user"
+      ELASTICSEARCH_PASSWORD: "hello_elastic_dev"
+    ports:
+      - "5601:5601"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+
   logstash:
     container_name: logstash
     build:
@@ -45,20 +67,6 @@ services:
     command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044" # Port pour Logstash si nécessaire
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.8.0
-    container_name: kibana
-    depends_on:
-      - elasticsearch
-    environment:
-      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
-    ports:
-      - "5601:5601"
-    deploy:
-      resources:
-        limits:
-          memory: 2g
 
 volumes:
   es-data:
