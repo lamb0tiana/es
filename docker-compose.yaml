@@ -4,17 +4,10 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=true
+      - xpack.security.enabled=false
       - xpack.monitoring.collection.enabled=true
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.verification_mode=certificate
-      - xpack.security.transport.ssl.key=certs/elasticsearch.key
-      - xpack.security.transport.ssl.certificate=certs/elasticsearch.crt
-      - xpack.security.transport.ssl.certificate_authorities=certs/elasticsearch.crt
-      - ELASTIC_PASSWORD=hello_elastic_dev
-      - KIBANA_PASSWORD=hello_kibana_dev
     ulimits:
       memlock:
         soft: -1
@@ -31,7 +24,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-    command: bash -c "/usr/local/bin/docker-entrypoint.sh && bash /usr/share/elasticsearch/config/es_script.sh"
 
 
   kibana:
@@ -41,8 +33,6 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
-      ELASTICSEARCH_USERNAME: "kibana_system_user"
-      ELASTICSEARCH_PASSWORD: "hello_elastic_dev"
     ports:
       - "5601:5601"
     deploy:
@@ -58,7 +48,7 @@ services:
       dockerfile: LogstashDockerfile
     volumes:
       - ./pipeline:/usr/share/logstash/pipeline
-      - ./data:/usr/share/logstash/data
+      - ./data:/usr/share/logstash/inputs
     environment:
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
     depends_on:
