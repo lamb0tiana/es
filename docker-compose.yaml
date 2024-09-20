@@ -45,8 +45,8 @@ services:
     volumes:
       - ./data:/data
     build:
-      context: .
-      dockerfile: FtpDockerFile
+      context: ftp
+      dockerfile: Dockerfile
   logstash:
     container_name: logstash
     build:
