@@ -6,4 +6,6 @@ RUN mkdir /script
 COPY script.sh /script/puller.sh
 COPY converter.sh /script/converter.sh
 RUN chmod +x /script/puller.sh
-ENTRYPOINT ["/script/puller.sh"]
+RUN chmod +x /script/converter.sh
+
+ENTRYPOINT ["/script/puller.sh", "/script/converter.sh"]

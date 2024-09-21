@@ -47,7 +47,6 @@ services:
     build:
       context: ftp
       dockerfile: Dockerfile
-    command: /bin/bash /script/converter.sh
   logstash:
     container_name: logstash
     build:
