@@ -42,11 +42,14 @@ services:
 
   csv_puller:
     container_name: csv_puller
+    env_file:
+      - ftp/.env
     volumes:
       - ./data:/data
     build:
       context: ftp
       dockerfile: Dockerfile
+    command: /bin/bash /script/puller.sh
   logstash:
     container_name: logstash
     build:
@@ -65,7 +68,20 @@ services:
     command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044" # Port pour Logstash si nécessaire
-
+  database:
+    image: 'mariadb:10.5'
+    container_name: database
+    restart: always
+    environment:
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'root'
+      MYSQL_DATABASE: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - db-data:/var/lib/mysql/
+    ports:
+      - '3310:3306'
 volumes:
+  db-data:
   es-data:
     driver: local
