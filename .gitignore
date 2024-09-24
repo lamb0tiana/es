@@ -1,2 +1,4 @@
 .idea/
+data/entries/riester/*
+tmp/riester
 ftp/.env

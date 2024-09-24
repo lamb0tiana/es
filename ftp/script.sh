@@ -12,7 +12,6 @@ if [ -d "$LOCAL_DIR/riester" ]; then
   rm -rf "$LOCAL_DIR/riester"/*
 else
   echo "Le répertoire $LOCAL_DIR/riester n'existe pas. on passe"
-  exit 1
 fi
 echo "pulling csv...."
 #
