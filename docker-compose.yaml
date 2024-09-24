@@ -45,11 +45,11 @@ services:
     env_file:
       - ftp/.env
     volumes:
-      - ./data:/data
+      - ./data:/home/
+      - ./tmp:/tmp
     build:
       context: ftp
       dockerfile: Dockerfile
-    command: /bin/bash /script/puller.sh
   logstash:
     container_name: logstash
     build:
@@ -57,12 +57,12 @@ services:
       dockerfile: LogstashDockerfile
     volumes:
       - ./pipeline:/usr/share/logstash/pipeline
-      - ./data:/usr/share/logstash/inputs
+      - ./data/entries:/usr/share/logstash/inputs
     environment:
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
     depends_on:
       csv_puller:
-        condition: service_completed_successfully
+        condition: service_started
       elasticsearch:
         condition: service_healthy
     command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
@@ -77,6 +77,10 @@ services:
       MYSQL_PASSWORD: 'root'
       MYSQL_DATABASE: 'root'
       MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      MARIADB_WAIT_TIMEOUT: 28800    # 8 heures
+      MARIADB_INTERACTIVE_TIMEOUT: 28800
+      MARIADB_MAX_ALLOWED_PACKET: 256M
     volumes:
       - db-data:/var/lib/mysql/
     ports:

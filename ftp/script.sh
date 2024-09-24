@@ -7,23 +7,29 @@ echo "go to $SFTP_HOST"
 # Ajouter la clé d'hôte SFTP au fichier known_hosts
 ssh-keyscan -H "$SFTP_HOST" >> ~/.ssh/known_hosts
 chmod 644 ~/.ssh/known_hosts
-
+if [ -d "$LOCAL_DIR/riester" ]; then
+  echo "Suppression du contenu du répertoire $LOCAL_DIR/riester"
+  rm -rf "$LOCAL_DIR/riester"/*
+else
+  echo "Le répertoire $LOCAL_DIR/riester n'existe pas. on passe"
+  exit 1
+fi
 echo "pulling csv...."
 #
 ## Connexion SFTP avec sshpass
 sshpass -p "$SFTP_PASSWORD" sftp -o StrictHostKeyChecking=no $SFTP_USER@$SFTP_HOST <<EOF
 cd $REMOTE_DIR
-lcd $LOCAL_DIR
+lcd $TEMP_DIR
 mget *.csv
 bye
 EOF
-echo "Fichiers récupérés dans $LOCAL_DIR :"
+echo "Fichiers récupérés dans $TEMP_DIR :"
 
 echo "handle csv"
-if ls "$LOCAL_DIR"/*.csv 1> /dev/null 2>&1; then
+if ls "$TEMP_DIR"/*.csv 1> /dev/null 2>&1; then
   echo "conversion des fichiers en séparateur à virgules :"
 
-  for file in "$LOCAL_DIR"/*.csv; do
+  for file in "$TEMP_DIR"/*.csv; do
     if [ -f "$file" ]; then
       echo "Traitement du fichier : $file \n"
       echo "FIX ENCODING"
@@ -36,5 +42,6 @@ if ls "$LOCAL_DIR"/*.csv 1> /dev/null 2>&1; then
     fi
   done
 else
-  echo "Aucun fichier CSV trouvé dans $LOCAL_DIR"
+  echo "Aucun fichier CSV trouvé dans $TEMP_DIR"
 fi
+mv $TEMP_DIR/* $LOCAL_DIR/riester/
