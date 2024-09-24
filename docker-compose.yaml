@@ -8,7 +8,6 @@ services:
       - xpack.monitoring.collection.enabled=true
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-
     ulimits:
       memlock:
         soft: -1
@@ -19,27 +18,13 @@ services:
     volumes:
       - es-data:/usr/share/elasticsearch/data
       - ./certs:/usr/share/elasticsearch/config/certs
+      - ./es_script.sh:/usr/share/elasticsearch/config/es_script.sh
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
-  logstash:
-    container_name: logstash
-    build:
-      context: .
-      dockerfile: LogstashDockerfile
-    volumes:
-      - ./pipeline:/usr/share/logstash/pipeline
-      - ./data:/usr/share/logstash/data
-    environment:
-      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
-    ports:
-      - "5044:5044" # Port pour Logstash si nécessaire
+
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.8.0
@@ -55,6 +40,52 @@ services:
         limits:
           memory: 2g
 
+  csv_puller:
+    container_name: csv_puller
+    env_file:
+      - ftp/.env
+    volumes:
+      - ./data:/home/
+      - ./tmp:/tmp
+    build:
+      context: ftp
+      dockerfile: Dockerfile
+  logstash:
+    container_name: logstash
+    build:
+      context: .
+      dockerfile: LogstashDockerfile
+    volumes:
+      - ./pipeline:/usr/share/logstash/pipeline
+      - ./data/entries:/usr/share/logstash/inputs
+    environment:
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+    depends_on:
+      csv_puller:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+    command: logstash --config.reload.automatic -f /usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5044:5044" # Port pour Logstash si nécessaire
+  database:
+    image: 'mariadb:10.5'
+    container_name: database
+    restart: always
+    environment:
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'root'
+      MYSQL_DATABASE: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      MARIADB_WAIT_TIMEOUT: 28800    # 8 heures
+      MARIADB_INTERACTIVE_TIMEOUT: 28800
+      MARIADB_MAX_ALLOWED_PACKET: 256M
+    volumes:
+      - db-data:/var/lib/mysql/
+    ports:
+      - '3310:3306'
 volumes:
+  db-data:
   es-data:
     driver: local
