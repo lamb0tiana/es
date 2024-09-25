@@ -35,7 +35,8 @@ process_csv_files() {
         iconv -f ISO-8859-1 -t UTF-8 "$file" -o "$file"
         echo "REMOVE UNNECESSARY FIRST LINE"
         sed -i '1d' "$file"
-        sed -i 's/\t/,/g' "$file"
+        sed -i 's/;/,/g' "$file"
+        sed -i 's/\t/;/g' "$file"
         echo "handled file > : $file"
       fi
     done
