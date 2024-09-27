@@ -3,3 +3,4 @@ data/entries/riester/*
 tmp/riester
 puller/.env
 app/.env
+app/lib/es/__pycache__
