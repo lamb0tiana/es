@@ -17,8 +17,6 @@ services:
       - "9300:9300"
     volumes:
       - es-data:/usr/share/elasticsearch/data
-      - ./certs:/usr/share/elasticsearch/config/certs
-      - ./es_script.sh:/usr/share/elasticsearch/config/es_script.sh
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://elasticsearch:9200/_cluster/health" ]
       interval: 30s
@@ -43,12 +41,12 @@ services:
   csv_puller:
     container_name: csv_puller
     env_file:
-      - ftp/.env
+      - puller/.env
     volumes:
       - ./data:/home/
       - ./tmp:/tmp
     build:
-      context: ftp
+      context: puller
       dockerfile: Dockerfile
   logstash:
     container_name: logstash
@@ -85,6 +83,13 @@ services:
       - db-data:/var/lib/mysql/
     ports:
       - '3310:3306'
+  app:
+    container_name: app
+    build:
+      context: app
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
 volumes:
   db-data:
   es-data:
