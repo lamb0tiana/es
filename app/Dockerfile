@@ -11,10 +11,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-#COPY crontab /etc/cron.d/my_cron
+COPY cron /etc/cron.d/cron
 
-RUN #chmod 0644 /etc/cron.d/my_cron
+RUN chmod 0644 /etc/cron.d/cron
 
-RUN #crontab /etc/cron.d/my_cron
+RUN crontab /etc/cron.d/cron
 
 CMD ["cron", "-f"]
