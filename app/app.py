@@ -22,7 +22,6 @@ try:
     results = []
     if query.meta.status == 200:
         results = query.body['hits']['hits']
-        print('got {} results'.format(len(results)))
         matchingColumns = riesterAPJMatchingColumns + riesterVNJMatchingColumns + riesterVNJMatchingColumns
 
         for result in results:
@@ -54,27 +53,34 @@ try:
                 esClient.updateDocument(es_id, {'user_id': new_contact_id})
                 counter_of_new_contact[behavior] += 1
 
-    print(f'got {matched_count_contact} matches || ({100 * (matched_count_contact / len(results)):.2f}%)')
-    print(f'new contact {new_count_contact} || ({100 * (new_count_contact / len(results)):.2f}%) ')
-    print('DETAILS')
-    print('FROM ALL MATCHES:: +NOM+PRNOM+EMAIL+TEL')
-    print(f'NEW CONTACTS {counter_of_matched_contact[behavior.ALL_MATCHES]} || ({100 * (counter_of_matched_contact[behavior.ALL_MATCHES] / len(results)):.2f}%)')
-    print(f'EXIST CONTACTS {counter_of_new_contact[behavior.ALL_MATCHES]} || ({100 * (counter_of_new_contact[behavior.ALL_MATCHES] / len(results)):.2f}%)')
 
+    print(f'GOT {len(results)}  FACTURES')
+    print(f'got {matched_count_contact} contact matched || ({100 * (matched_count_contact / len(results)):.2f}%)')
+    print(f'got {new_count_contact} new inserted contact || ({100 * (new_count_contact / len(results)):.2f}%)')
+    print('DETAILS: ')
+    print('FROM ALL MATCHES:: +NOM+PRNOM+EMAIL+TEL')
+    print(f'MATCHED CONTACTS {counter_of_matched_contact[behavior.ALL_MATCHES]} || ({100 * (counter_of_matched_contact[behavior.ALL_MATCHES] / len(results)):.2f}%)')
+    print(f'NEW CONTACTS {counter_of_new_contact[behavior.ALL_MATCHES]} || ({100 * (counter_of_new_contact[behavior.ALL_MATCHES] / len(results)):.2f}%)')
+    print('####################')
 
     print('FROM ALL MAIN_MATCHES_OTHER_MATCHES_ONE:: +NOM+PRENOM +(EMAIL|TEL)')
-    print(f'NEW CONTACTS {counter_of_matched_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE]} || ({100 * (counter_of_matched_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE] / len(results)):.2f}%)')
-    print(f'EXIST CONTACTS {counter_of_new_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE]} || ({100 * (counter_of_new_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE] / len(results)):.2f}%)')
+    print(f'MATCHED CONTACTS {counter_of_matched_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE]} || ({100 * (counter_of_matched_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE] / len(results)):.2f}%)')
+    print(f'NEW CONTACTS {counter_of_new_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE]} || ({100 * (counter_of_new_contact[behavior.MAIN_MATCHES_OTHER_MATCHES_ONE] / len(results)):.2f}%)')
+    print('####################')
 
 
     print('FROM ALL ONLY_MAIN_MATCH:: +NOM+PRENOM EMAIL TEL')
-    print(f'NEW CONTACTS {counter_of_matched_contact[behavior.ONLY_MAIN_MATCH]} || ({100 * (counter_of_matched_contact[behavior.ONLY_MAIN_MATCH] / len(results)):.2f}%)')
-    print(f'EXIST CONTACTS {counter_of_new_contact[behavior.ONLY_MAIN_MATCH]} || ({100 * (counter_of_new_contact[behavior.ONLY_MAIN_MATCH] / len(results)):.2f}%)')
+    print(f'MATCHED CONTACTS {counter_of_matched_contact[behavior.ONLY_MAIN_MATCH]} || ({100 * (counter_of_matched_contact[behavior.ONLY_MAIN_MATCH] / len(results)):.2f}%)')
+    print(f'NEW CONTACTS {counter_of_new_contact[behavior.ONLY_MAIN_MATCH]} || ({100 * (counter_of_new_contact[behavior.ONLY_MAIN_MATCH] / len(results)):.2f}%)')
+    print('####################')
 
 
     print('FROM ALL SOME_MAIN_MATCH:: +(NOM|PRENOM) +(EMAIL|TEL)')
     print(f'NEW CONTACTS {counter_of_matched_contact[behavior.SOME_MAIN_MATCH]} || ({100 * (counter_of_matched_contact[behavior.SOME_MAIN_MATCH] / len(results)):.2f}%)')
-    print(f'EXIST CONTACTS {counter_of_new_contact[behavior.SOME_MAIN_MATCH]} || ({100 * (counter_of_new_contact[behavior.SOME_MAIN_MATCH] / len(results)):.2f}%)')
+    print(f'MATCHED CONTACTS {counter_of_new_contact[behavior.SOME_MAIN_MATCH]} || ({100 * (counter_of_new_contact[behavior.SOME_MAIN_MATCH] / len(results)):.2f}%)')
+
+
+
 
 
     dbClient.cursor.close()
