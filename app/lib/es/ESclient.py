@@ -6,8 +6,8 @@ from elasticsearch import Elasticsearch
 class ESClient:
     es_client: Elasticsearch
 
-    def __init__(self, index: str = 'riester'):
-        self.es_client = Elasticsearch("http://elasticsearch:9200")
+    def __init__(self, index: str, es_host: str):
+        self.es_client = Elasticsearch(es_host)
         self.index = index
 
     def queryDocument(self):
