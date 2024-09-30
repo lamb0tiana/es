@@ -12,7 +12,12 @@ class ESClient:
 
     def queryDocument(self):
         try:
-            return self.es_client.search(index=self.index, query= {"match_all": {}}, size=10000)
+            return self.es_client.search(index=self.index, query= {"range": {
+      "@timestamp": {
+        "gte": "now/d",
+        "lt": "now+1d/d"
+      }
+    }}, size=10000)
         except Exception as e:
             print(e.message)
 
