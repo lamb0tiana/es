@@ -17,5 +17,5 @@ RUN chmod 0644 /etc/cron.d/cron
 
 RUN crontab /etc/cron.d/cron
 EXPOSE 8000
-CMD ["sh", "-c", "cron && fastapi dev --reload --host 0.0.0.0 --port 8000 api/entry.py"]
+CMD ["sh", "-c", "cron && fastapi dev --reload --host 0.0.0.0 --port 8000 api/entrypoint.py"]
 
