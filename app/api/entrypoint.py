@@ -22,8 +22,8 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def edit_contact(contact_id: int, user: UserModel):
     load_dotenv()
     db = os.getenv('DB_NAME')
-    # dbClient = DBclient(db)
-    DBclient.update_contact(contact_id, user)
+    dbClient = DBclient(db)
+    dbClient.update_contact(contact_id, user)
     return {"contact_id": contact_id}
 
 if __name__ == "__main__":

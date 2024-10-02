@@ -2,7 +2,7 @@ import os
 import mysql.connector
 from dotenv import load_dotenv
 from app.lib.tools import generate_matching_query, extract_insertable_field_data, build_insert_query, build_update_query
-
+from app.model.Contact import UserModel
 load_dotenv()
 
 class DBclient:
@@ -64,7 +64,7 @@ class DBclient:
         else:
             print("No active database connection.")
             return None
-    def update_contact(self, id: int, fields: list):
+    def update_contact(self, id: int, fields: UserModel):
         if self.connexionDB and self.connexionDB.is_connected():
             try:
                 row_data = build_update_query(fields)

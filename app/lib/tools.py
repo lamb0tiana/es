@@ -1,5 +1,6 @@
-from .constant import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, requiredMatchingFields, \
+from app.lib.constant  import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, requiredMatchingFields, \
     QueryBehavior, mappingDbFields
+from app.model.Contact import UserModel
 import re
 import itertools
 
@@ -80,7 +81,8 @@ def build_insert_query(rows: list):
     return None
 
 
-def build_update_query(row: list):
+def build_update_query(row: UserModel):
+    fields = row.__dict__
     a = ''
 
 def extract_insertable_field_data(es_entries: list):
