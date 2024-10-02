@@ -1,7 +1,7 @@
 import os
 import mysql.connector
 from dotenv import load_dotenv
-from lib.tools import generate_matching_query, extract_insertable_field_data, build_insert_query
+from app.lib.tools import generate_matching_query, extract_insertable_field_data, build_insert_query, build_update_query
 
 load_dotenv()
 
@@ -64,3 +64,13 @@ class DBclient:
         else:
             print("No active database connection.")
             return None
+    def update_contact(self, id: int, fields: list):
+        if self.connexionDB and self.connexionDB.is_connected():
+            try:
+                row_data = build_update_query(fields)
+                p = ''
+            except mysql.connector.Error as err:
+                print(f"Error Code: {err.errno}")
+                print(f"SQLSTATE: {err.sqlstate}")
+                print(f"Error Message: {err.msg}")
+                return None

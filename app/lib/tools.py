@@ -1,4 +1,4 @@
-from lib.constant import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, requiredMatchingFields, \
+from .constant import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, requiredMatchingFields, \
     QueryBehavior, mappingDbFields
 import re
 import itertools
@@ -7,6 +7,7 @@ import itertools
 def sanitize_string(string):
     pattern = r'\+33|-'
     string = re.sub(pattern, '', string)
+    string = re.sub(r"'",' ', string)
     return re.sub(r'\+', ' ', string)
 
 
@@ -78,6 +79,9 @@ def build_insert_query(rows: list):
 
     return None
 
+
+def build_update_query(row: list):
+    a = ''
 
 def extract_insertable_field_data(es_entries: list):
     dbFields = mappingDbFields.values()

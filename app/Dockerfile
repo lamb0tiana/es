@@ -16,6 +16,8 @@ COPY cron /etc/cron.d/cron
 RUN chmod 0644 /etc/cron.d/cron
 
 RUN crontab /etc/cron.d/cron
+ENV PYTHONPATH=/app
+
 EXPOSE 8000
 CMD ["sh", "-c", "cron && fastapi dev --reload --host 0.0.0.0 --port 8000 api/entrypoint.py"]
 
