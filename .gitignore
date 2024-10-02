@@ -8,3 +8,4 @@ app/lib/__pycache__
 app/__pycache__
 app/lib/mysql/__pycache__
 app/api/__pycache__
+app/model/__pycache__

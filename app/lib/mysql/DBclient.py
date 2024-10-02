@@ -2,8 +2,10 @@ import os
 import mysql.connector
 from dotenv import load_dotenv
 from app.lib.tools import generate_matching_query, extract_insertable_field_data, build_insert_query, build_update_query
-from app.model.Contact import UserModel
+from app.model.Contact import ContactModel
+
 load_dotenv()
+
 
 class DBclient:
 
@@ -28,7 +30,7 @@ class DBclient:
         if self.connexionDB and self.connexionDB.is_connected():
             self.connexionDB.close()
 
-    def match_string(self, criteria: str , id: str):
+    def match_string(self, criteria: str, id: str):
         if self.connexionDB and self.connexionDB.is_connected():
             try:
                 cursor = self.connexionDB.cursor(dictionary=True)
@@ -64,11 +66,16 @@ class DBclient:
         else:
             print("No active database connection.")
             return None
-    def update_contact(self, id: int, fields: UserModel):
+
+    def update_contact(self, id: int, fields: ContactModel):
         if self.connexionDB and self.connexionDB.is_connected():
             try:
-                row_data = build_update_query(fields)
-                p = ''
+                row_data = build_update_query(id, fields)
+                self.cursor.execute(row_data)
+                count = self.cursor.rowcount
+                self.connexionDB.commit()
+
+                return count
             except mysql.connector.Error as err:
                 print(f"Error Code: {err.errno}")
                 print(f"SQLSTATE: {err.sqlstate}")

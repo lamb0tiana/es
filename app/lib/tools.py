@@ -1,6 +1,7 @@
-from app.lib.constant  import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, requiredMatchingFields, \
+from app.lib.constant import riesterDBColumns, riesterAPJMatchingColumns, riesterVNJMatchingColumns, \
+    requiredMatchingFields, \
     QueryBehavior, mappingDbFields
-from app.model.Contact import UserModel
+from app.model.Contact import ContactModel
 import re
 import itertools
 
@@ -8,7 +9,7 @@ import itertools
 def sanitize_string(string):
     pattern = r'\+33|-'
     string = re.sub(pattern, '', string)
-    string = re.sub(r"'",' ', string)
+    string = re.sub(r"'", ' ', string)
     return re.sub(r'\+', ' ', string)
 
 
@@ -39,7 +40,7 @@ def build_criteria(criterias: list, behavior: QueryBehavior = QueryBehavior.ALL_
         v is not None and k in matchingColumns and k not in requiredMatchingFields}
 
     is_main_matching_query = behavior in [QueryBehavior.ALL_MATCHES, QueryBehavior.ONLY_MAIN_MATCH]
-    is_main_and_one_right = behavior ==  QueryBehavior.MAIN_MATCHES_OTHER_MATCHES_ONE
+    is_main_and_one_right = behavior == QueryBehavior.MAIN_MATCHES_OTHER_MATCHES_ONE
     required_fields_candidates = [
         "+" + item if is_main_matching_query or is_main_and_one_right else item for item in
         main_field_candidates.values()]
@@ -47,12 +48,12 @@ def build_criteria(criterias: list, behavior: QueryBehavior = QueryBehavior.ALL_
     pass_fields_candidates = ["+" + item if behavior == QueryBehavior.ALL_MATCHES else item for item in
                               pass_field_candidates.values()]
 
-    separator = ' ' if is_main_matching_query or is_main_and_one_right  else '|'
+    separator = ' ' if is_main_matching_query or is_main_and_one_right else '|'
     required_string = separator.join(set(required_fields_candidates))
     pass_string = ('|' if is_main_and_one_right else separator).join(set(pass_fields_candidates))
 
     if is_main_and_one_right:
-        criteria = "({main})+({right})".format( main=required_string, right=pass_string)
+        criteria = "({main})+({right})".format(main=required_string, right=pass_string)
     else:
         criteria = required_string + ' ' + pass_string if is_main_matching_query else "+({})+({})".format(
             required_string,
@@ -81,9 +82,16 @@ def build_insert_query(rows: list):
     return None
 
 
-def build_update_query(row: UserModel):
+def build_update_query(id: int, row: ContactModel):
     fields = row.__dict__
-    a = ''
+    pattern = r'\+33'
+
+    result = ', '.join(f"{key}=\"{re.sub(pattern, '0', value)}\"" for key, value in fields.items() if value is not None)
+    return f"""
+            UPDATE  lms_contact
+            SET {result} WHERE id={id}
+        """
+
 
 def extract_insertable_field_data(es_entries: list):
     dbFields = mappingDbFields.values()
